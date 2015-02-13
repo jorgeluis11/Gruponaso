@@ -22,9 +22,15 @@ from push_notifications.models import APNSDevice, GCMDevice
 def registration(request):
 	if request.GET:
 		name = request.GET.get("name")
-		gmc_reg_id = request.GET.get("regID")
-		if(GCMDevice.objects.get(registration_id=gmc_reg_id).count() != 0):
-			device = GCMDevice(name=name, registration_id=gmc_reg_id).save()
+		regid = request.GET.get("regID")
+		print regid
+		try:
+			device = GCMDevice.objects.get(registration_id=regid)
+		except GCMDevice.DoesNotExist:
+			device = None
+		if(device == None):
+			print "iffff"
+			device = GCMDevice(name=name, registration_id=regid).save()
 			# The first argument will be sent as "message" to the intent extras Bundle
 			# Retrieve it with intent.getExtras().getString("message")
 			print "stored"
@@ -32,8 +38,13 @@ def registration(request):
 
 def pushExample(request):
 	if request.GET:
-		gcm_reg_id = request.GET.get("registration_id")
-		device = GCMDevice.objects.get(registration_id=gcm_reg_id)
+		regid = request.GET.get("regID")
+		try:
+			device = GCMDevice.objects.get(registration_id=regid)
+		except GCMDevice.DoesNotExist:
+			device = None
+			return HttpResponse("Push not send")
+ 
 		# The first argument will be sent as "message" to the intent extras Bundle
 		# Retrieve it with intent.getExtras().getString("message")
 		device.send_message("Weeeepaleee")
