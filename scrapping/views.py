@@ -23,7 +23,7 @@ def registration(request):
 	if request.GET:
 		name = request.GET.get("name")
 		gmc_reg_id = request.GET.get("regID")
-		if(GCMDevice.objects.get(registration_id=gcm_reg_id).count() != 0):
+		if(GCMDevice.objects.get(registration_id=gmc_reg_id).count() != 0):
 			device = GCMDevice(name=name, registration_id=gmc_reg_id).save()
 			# The first argument will be sent as "message" to the intent extras Bundle
 			# Retrieve it with intent.getExtras().getString("message")
