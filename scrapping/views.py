@@ -45,13 +45,15 @@ def pushExample(request):
 		regid = request.GET.get("regID")
 		try:
 			device = GCMDevice.objects.get(registration_id=regid)
+			device.send_message("Weeeepaleee")
+			print "mail send"
+			return HttpResponse("Sendend")
 		except GCMDevice.DoesNotExist:
 			device = None
 			return HttpResponse("Push not send")
  
 		# The first argument will be sent as "message" to the intent extras Bundle
 		# Retrieve it with intent.getExtras().getString("message")
-		device.send_message("Weeeepaleee")
-		print "mail send"
+		
 	return HttpResponse("Send!!!")
 #index("a")
