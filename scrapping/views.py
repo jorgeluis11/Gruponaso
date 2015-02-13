@@ -9,7 +9,7 @@ import urllib
 def index(request):
 	d = pq(url="http://www.groopanda.com/todos", parser="html")
 	x = d(".list_products").html()
-	print x
+	#print x
 	return render(request, "index.html", {"products":x})
 
 def groopanda():
