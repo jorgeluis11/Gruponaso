@@ -34,6 +34,10 @@ def registration(request):
 			# The first argument will be sent as "message" to the intent extras Bundle
 			# Retrieve it with intent.getExtras().getString("message")
 			print "stored"
+			return HttpResponse("Si Guardo!!!!!")
+		else:
+			return HttpResponse("Existe!")
+		
 	return HttpResponse("Stored!!!")
 
 def pushExample(request):
