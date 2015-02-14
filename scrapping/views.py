@@ -46,7 +46,7 @@ def pushExample(request):
 		regid = request.GET.get("regID")
 		try:
 			device = GCMDevice.objects.get(registration_id=regid)
-			time.sleep(1000)
+			time.sleep(10)
 			device.send_message("Weeeepaleee")
 			print "mail send"
 			return HttpResponse("Sendend")
