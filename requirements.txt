@@ -11,5 +11,6 @@ lxml==3.4.2
 psycopg2==2.6
 pyquery==1.2.9
 requests==2.5.1
+simplejson==3.6.5
 static3==0.5.1
 wsgiref==0.1.2
