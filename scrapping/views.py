@@ -5,13 +5,38 @@ from pyquery import PyQuery as pq
 from lxml import etree
 import urllib
 import time
- 
+import simplejson
 
 def index(request):
-	d = pq(url="http://www.groopanda.com/todos", parser="html")
-	x = d(".list_products").html()
-	#print x
-	return render(request, "index.html", {"products":x})
+	response = requests.get('http://www.groopanda.com/todos')
+	d = pq(response.content)
+	groupon = d("li.list_item_product")
+
+	items = []
+	for item in groupon:
+		itemEl = d(item)
+		items.append({
+			"image": itemEl.find(".list_item_image img").attr["src"],
+			"link" : itemEl.find(".list_item_image").attr["href"], 
+		})
+	
+	data = {
+		"items" : items
+	}
+	
+	groupon = []
+
+	#data = {
+	#	"text"  : "text",
+	#	"images": [d(item).attr["src"] for item in d("ul.list_products").find("img")],
+	#	"links" : [d(item).attr["href"] for item in d("ul.list_products").find("a")]
+	#}
+	#print d(".list_products").find(".list_item_image")
+	return HttpResponse(simplejson.dumps(data), content_type='application/json')
+
+
+def my_print(x):
+    print x
 
 def groopanda():
 	d = pq(url="http://www.groopanda.com/todos", parser="html")

@@ -2,7 +2,11 @@
 <head>
 	<title></title>
 </head>
-<body>aaa
-	{{products|safe}}
-</body>
+<body>a
+		{%for item in groupons.items%}
+			<a href="{{item.link}}">
+			<img src="{{item.image}}"/>
+			</a>
+		{%endfor%}
+	</body>
 </html>
