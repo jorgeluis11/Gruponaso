@@ -4,6 +4,7 @@ import requests
 from pyquery import PyQuery as pq
 from lxml import etree
 import urllib
+import time
  
 
 def index(request):
@@ -45,6 +46,7 @@ def pushExample(request):
 		regid = request.GET.get("regID")
 		try:
 			device = GCMDevice.objects.get(registration_id=regid)
+			time.sleep(1000)
 			device.send_message("Weeeepaleee")
 			print "mail send"
 			return HttpResponse("Sendend")
