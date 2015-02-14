@@ -16,8 +16,10 @@ def index(request):
 	for item in groupon:
 		itemEl = d(item)
 		items.append({
-			"image": itemEl.find(".list_item_image img").attr["src"],
-			"link" : itemEl.find(".list_item_image").attr["href"], 
+			"title": itemEl.children(".list_item_title").text(),
+			"text" : itemEl.children(".list_item_merchant").text(),
+			"image": itemEl.children(".list_item_image img").attr["src"],
+			"link" : itemEl.children(".list_item_image").attr["href"], 
 		})
 	
 	data = {
