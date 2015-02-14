@@ -58,4 +58,21 @@ def pushExample(request):
 		# Retrieve it with intent.getExtras().getString("message")
 		
 	return HttpResponse("Send!!!")
+
+def pushInstant(request):
+	if request.GET:
+		regid = request.GET.get("regID")
+		try:
+			device = GCMDevice.objects.get(registration_id=regid)
+			device.send_message("Weeeepaleee")
+			print "mail send"
+			return HttpResponse("Sendend")
+		except GCMDevice.DoesNotExist:
+			device = None
+			return HttpResponse("Push not send")
+ 
+		# The first argument will be sent as "message" to the intent extras Bundle
+		# Retrieve it with intent.getExtras().getString("message")
+		
+	return HttpResponse("Send!!!")
 #index("a")
