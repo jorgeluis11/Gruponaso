@@ -1,49 +1,49 @@
 from django.shortcuts import render, HttpResponse
-import requests
+import requests, ast, urllib, time, simplejson
 # from bs4 import BeautifulSoup
 from pyquery import PyQuery as pq
 from lxml import etree
-import urllib
-import time
-import simplejson
+
+
 
 link = [["groopanda","http://www.groopanda.com/todos","li.list_item_product"],
-		["oferta","http://www.ofertadeldia.com/puerto-rico-ofertas/oferta",""]]
+		["oferta","http://www.ofertadeldia.com/puerto-rico-ofertas/oferta","li.other-offer"]]
 
+link = {
+	"groopanda":{
+		"link"    : "http://www.groopanda.com/todos",
+		"element" : "li.list_item_product"
+	},
+	"oferta":{
+		"link"   : "http://www.ofertadeldia.com/puerto-rico-ofertas/oferta",
+		"element": "li.other-offer"
+	}
+}
 def index(request):
 	if request.GET:
 		start = int(request.GET.get("start"))
-		end   = int(request.GET.get("end"))
-		list  = ["groopanda","oferta"]
-		index = 0
+		end = start + 10
+		index = int(request.GET.get("index"))
 		next  = 0
+		company_list = request.GET.get("list").split(",")
 
-		groupon = []
-		groupon = getGroupon(start, end, index)
-		
+		groupon = getGroupon(start, end, index, company_list)
 		length = len(groupon)
-		if(length != 10):
-			next  = length
+		
+		if length != 10 and len(link) is not index+1:
+			next  = 10 - length
+			print next
 			index = index + 1
-			nextGroup = getGroupon(0, next, index)
-			if nextGroup:
-				groupon.append(nextGroup)
+			nextGroup = getGroupon(0, next, index, company_list)
 			
-		
-		items = []
-		
-		for item in groupon:
-			itemEl = pq(item)
-
-			items.append({
-				"title": itemEl.children(".list_item_merchant").text() ,
-				"text" : itemEl.children(".list_item_title").text(),
-				"image": itemEl.children(".list_item_image img").attr["src"],
-				"link" : itemEl.children(".list_item_image").attr["href"], 
-			})
+			if nextGroup:
+				groupon = groupon + nextGroup
 		
 		data = {
-			"items" : items
+			'start' : start,
+			'end'   : end,
+			'index' : index,
+			"items" : groupon
 		}
 	else:
 		data = {}
@@ -56,15 +56,52 @@ def index(request):
 	#print d(".list_products").find(".list_item_image")
 	return HttpResponse(simplejson.dumps(data), content_type='application/json')
 
-def getGroupon(start,end,index):
-	if link[index][0] == "groopanda":
-		response = requests.get(link[index][1])
+def getGroupon(start,end,index, company_list):
+	company = company_list[index]
+	if company == "groopanda":
+		
+		website = link.get(company)
+		response = requests.get(website.get("link"))
+		print website
 		d = pq(response.content)
-		return d(link[index][2])[start:end]
-	elif link[index][0] == "oferta":
-		response = requests.get(link[index][1])
+		items = []
+		for item in d(website.get("element"))[start:end]:
+			itemEl = d(item)
+			items.append({
+				'from' : "groopanda",
+				"title": itemEl.children(".list_item_merchant").text() ,
+				"text" : itemEl.children(".list_item_title").text(),
+				"image": itemEl.children(".list_item_image img").attr["src"],
+				"link" : itemEl.children(".list_item_image").attr["href"], 
+			})
+		return items 
+	elif company == "oferta":
+		website = link.get(company)
+		response = requests.get(website.get("link"))
 		d = pq(response.content)
-		return d(link[index][2])[start:end]
+		items = []
+
+		if start is 0:
+			items.append({
+				'from' : "oferta",
+				"title": d(".name").text() ,
+				"text" : d(".description").children("p").text(),
+				"image": d(".gallery2-holder").find("li:first").children("img").attr["src"] ,
+				"link" : "http://www.ofertadeldia.com" + d(".btn-purchase").attr["href"] ,
+			})
+			end = end-1
+
+			
+		for item in d(website.get("element"))[start:end]:
+			itemEl = d(item)
+			items.append({
+				'from' : "oferta",
+				"title": itemEl.find(".title").text() ,
+				"text" : itemEl.find(".advertiser").text(),
+				"image": itemEl.find(".image").children("img").attr["src"],
+				"link" : "http://www.ofertadeldia.com" + itemEl.find("a").attr["href"], 
+			})
+		return items 
 
 #use Later
 #response = requests.get(link)
