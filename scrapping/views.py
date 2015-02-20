@@ -7,26 +7,46 @@ import urllib
 import time
 import simplejson
 
-def index(request):
-	response = requests.get('http://www.groopanda.com/todos')
-	d = pq(response.content)
-	groupon = d("li.list_item_product")
+link = [["groopanda","http://www.groopanda.com/todos","li.list_item_product"],
+		["oferta","http://www.ofertadeldia.com/puerto-rico-ofertas/oferta",""]]
 
-	items = []
-	for item in groupon:
-		itemEl = d(item)
-		items.append({
-			"title": itemEl.children(".list_item_merchant").text() ,
-			"text" : itemEl.children(".list_item_title").text(),
-			"image": itemEl.children(".list_item_image img").attr["src"],
-			"link" : itemEl.children(".list_item_image").attr["href"], 
-		})
-	
-	data = {
-		"items" : items
-	}
-	
-	groupon = []
+def index(request):
+	if request.GET:
+		start = int(request.GET.get("start"))
+		end   = int(request.GET.get("end"))
+		list  = ["groopanda","oferta"]
+		index = 0
+		next  = 0
+
+		groupon = []
+		groupon = getGroupon(start, end, index)
+		
+		length = len(groupon)
+		if(length != 10):
+			next  = length
+			index = index + 1
+			nextGroup = getGroupon(0, next, index)
+			if nextGroup:
+				groupon.append(nextGroup)
+			
+		
+		items = []
+		
+		for item in groupon:
+			itemEl = pq(item)
+
+			items.append({
+				"title": itemEl.children(".list_item_merchant").text() ,
+				"text" : itemEl.children(".list_item_title").text(),
+				"image": itemEl.children(".list_item_image img").attr["src"],
+				"link" : itemEl.children(".list_item_image").attr["href"], 
+			})
+		
+		data = {
+			"items" : items
+		}
+	else:
+		data = {}
 
 	#data = {
 	#	"text"  : "text",
@@ -35,6 +55,21 @@ def index(request):
 	#}
 	#print d(".list_products").find(".list_item_image")
 	return HttpResponse(simplejson.dumps(data), content_type='application/json')
+
+def getGroupon(start,end,index):
+	if link[index][0] == "groopanda":
+		response = requests.get(link[index][1])
+		d = pq(response.content)
+		return d(link[index][2])[start:end]
+	elif link[index][0] == "oferta":
+		response = requests.get(link[index][1])
+		d = pq(response.content)
+		return d(link[index][2])[start:end]
+
+#use Later
+#response = requests.get(link)
+#			d2 = pq(response.content)
+#							'phone': d2(".product_fine_print").text(),
 
 
 def my_print(x):
