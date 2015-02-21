@@ -7,7 +7,8 @@ from lxml import etree
 
 
 link = [["groopanda","http://www.groopanda.com/todos","li.list_item_product"],
-		["oferta","http://www.ofertadeldia.com/puerto-rico-ofertas/oferta","li.other-offer"]]
+		["oferta","http://www.ofertadeldia.com/puerto-rico-ofertas/oferta","li.other-offer"],
+		["ofertones","http://www.ofertones.com/pr","a.js_offer"]]
 
 link = {
 	"groopanda":{
@@ -17,6 +18,10 @@ link = {
 	"oferta":{
 		"link"   : "http://www.ofertadeldia.com/puerto-rico-ofertas/oferta",
 		"element": "li.other-offer"
+	},
+	"ofertones":{
+		"link"   : "http://www.ofertones.com/pr",
+		"element": "a.js_offer"
 	}
 }
 def index(request):
@@ -29,16 +34,16 @@ def index(request):
 
 		groupon = getGroupon(start, end, index, company_list)
 		length = len(groupon)
-		
-		if length != 10 and len(link) is not index+1:
+		print length is not index+1
+		if length != 10 and length is not index+1:
 			next  = 10 - length
-			print next
 			index = index + 1
-			nextGroup = getGroupon(0, next, index, company_list)
+			start = 0
 			
+			nextGroup = getGroupon(0, next, index, company_list)
 			if nextGroup:
 				groupon = groupon + nextGroup
-		
+
 		data = {
 			'start' : start,
 			'end'   : end,
@@ -58,13 +63,14 @@ def index(request):
 
 def getGroupon(start,end,index, company_list):
 	company = company_list[index]
+	items = []
+
 	if company == "groopanda":
 		
 		website = link.get(company)
 		response = requests.get(website.get("link"))
 		print website
 		d = pq(response.content)
-		items = []
 		for item in d(website.get("element"))[start:end]:
 			itemEl = d(item)
 			items.append({
@@ -74,12 +80,10 @@ def getGroupon(start,end,index, company_list):
 				"image": itemEl.children(".list_item_image img").attr["src"],
 				"link" : itemEl.children(".list_item_image").attr["href"], 
 			})
-		return items 
 	elif company == "oferta":
 		website = link.get(company)
 		response = requests.get(website.get("link"))
 		d = pq(response.content)
-		items = []
 
 		if start is 0:
 			items.append({
@@ -90,18 +94,32 @@ def getGroupon(start,end,index, company_list):
 				"link" : "http://www.ofertadeldia.com" + d(".btn-purchase").attr["href"] ,
 			})
 			end = end-1
-
+			print items
 			
 		for item in d(website.get("element"))[start:end]:
 			itemEl = d(item)
 			items.append({
 				'from' : "oferta",
 				"title": itemEl.find(".title").text() ,
-				"text" : itemEl.find(".advertiser").text(),
+				"text" : itemEl.find(".desc").text(),
 				"image": itemEl.find(".image").children("img").attr["src"],
 				"link" : "http://www.ofertadeldia.com" + itemEl.find("a").attr["href"], 
 			})
-		return items 
+	elif company == "ofertones":
+		website = link.get(company)
+		response = requests.get(website.get("link"))
+		d = pq(response.content)
+
+		for item in d(website.get("element"))[start:end]:
+			itemEl = d(item)
+			items.append({
+				'from' : "ofertones",
+				"title": itemEl.find(".desc").text() ,
+				"text" : itemEl.find(".pagas").text(),
+				"image": "http://www.ofertones.com" + itemEl.children("img").attr["src"],
+				"link" : "http://www.ofertones.com" + itemEl.attr["href"], 
+			})
+	return items 
 
 #use Later
 #response = requests.get(link)
