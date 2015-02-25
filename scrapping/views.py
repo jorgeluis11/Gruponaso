@@ -24,7 +24,7 @@ link = {
         "element": "a.js_offer"
     },
     "groupon": {
-        "link": "http://www.groupon.com.pr/descuentos/local/all",
+        "link": "http://www.groupon.com.pr/descuentos/all",
         "element": "div.deal-box"
     },
     "gustazos": {
@@ -50,7 +50,7 @@ def index(request):
         if length != 10 and length is not index+1:
             next = 10 - length
             index = index + 1
-            start = 0
+            start = next
             nextGroup = getGroupon(0, next, index, company_list)
             if nextGroup:
                 groupon = groupon + nextGroup
@@ -113,7 +113,7 @@ def getGroupon(start, end, index, company_list):
                 {
                     'from': "oferta",
                     "title": itemEl.find(".title").text(),
-                    "text": itemEl.find(".desc").text(),
+                    "text": itemEl.find(".advertiser").text(),
                     "image": itemEl.find(".image").children("img").attr["src"],
                     "link": "http://www.ofertadeldia.com" + itemEl.
                     find("a").attr["href"],
@@ -197,6 +197,10 @@ def getGroupon(start, end, index, company_list):
 
         if start is 0:
             first = d(".first-deal")
+            try:
+                prices = d(first.find(".price").children("span")[1]).text()
+            except Exception, e:
+                prices = d(first.find(".price").children("span")[0]).text()
             items.append({
                 'from': "groupon",
                 "title": first(".title").text(),
@@ -204,7 +208,7 @@ def getGroupon(start, end, index, company_list):
                 "image": first.find("img").attr["src"],
                 "link": "http://www.groupon.com.pr%s" % (first(".title")
                 .attr["href"]),
-                "price": d(first.find(".price").children("span")[1]).text(),
+                "price": prices,
             })
             end = end - 1
 
@@ -216,7 +220,6 @@ def getGroupon(start, end, index, company_list):
                 prices = itemEl.find(".price").find("span")[1]
             except Exception, e:
                 prices = itemEl.find(".price").find("span")[0]
-            print prices
             items.append({
                 'from': "groupon",
                 "title": itemEl(".deal-title").text(),
