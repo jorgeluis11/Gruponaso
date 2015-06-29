@@ -46,12 +46,13 @@ def index(request):
         groupon = get_groupon(start, end, index, company_list)
         length = len(groupon)
         print length
-        print length is not index + 1
-        if length != limit and length is not index + 1:
+        if length != limit:
+        #and length != index + 1:
             next = limit - length
             index = index + 1
             start = next
-            next_group = get_groupon(1, next, index, company_list)
+            print next
+            next_group = get_groupon(0, next, index, company_list)
             if next_group:
                 groupon = groupon + next_group
 
@@ -79,7 +80,7 @@ def get_groupon(start, end, index, company_list):
             item_el = d(item)
             items.append({
                 'from': "groopanda",
-                "title": item_el.children(".list_item_merchant").text(),
+                # "title": item_el.children(".list_item_merchant").text(),
                 "text": item_el.children(".list_item_title").text(),
                 "image": item_el.children(".list_item_image img").attr["src"],
                 "link": item_el.children(".list_item_image").attr["href"],
@@ -97,7 +98,7 @@ def get_groupon(start, end, index, company_list):
             items.append(
                 {
                     'from': "oferta",
-                    "title": d(".name").text(),
+                    # "title": d(".name").text(),
                     "text": d(".description").children("p").text(),
                     "image": d(".gallery2-holder").find("li:first").
                     children("img").attr["src"],
@@ -112,7 +113,7 @@ def get_groupon(start, end, index, company_list):
             items.append(
                 {
                     'from': "oferta",
-                    "title": item_el.find(".title").text(),
+                    # "title": item_el.find(".title").text(),
                     "text": item_el.find(".advertiser").text(),
                     "image": item_el.find(".image").children("img")
                     .attr["src"],
@@ -131,7 +132,7 @@ def get_groupon(start, end, index, company_list):
             items.append(
                 {
                     'from': "ofertones",
-                    "title": item_el.find(".desc").text(),
+                    # "title": item_el.find(".desc").text(),
                     "text": "",
                     "image": "http://www.ofertones.com" + item_el.
                     children("img").attr["src"],
@@ -158,7 +159,7 @@ def get_groupon(start, end, index, company_list):
             items.append(
                 {
                     'from': "gustazos",
-                    "title": first(".summary").children("h1").text(),
+                    # "title": first(".summary").children("h1").children("a").text(),
                     "text": first(".description").children("p").text(),
                     "image": first(".slideshow").find("img").attr["src"],
                     "link": "http://www.gustazos.com" + d(".summary").
@@ -166,7 +167,7 @@ def get_groupon(start, end, index, company_list):
                     "price": first.find(".price").text(),
                 })
             start = start + 1
-            end = end - 1
+            # end = end
 
         face = d(elements[1]).find("a").attr["href"]
         if face is None:
@@ -174,16 +175,17 @@ def get_groupon(start, end, index, company_list):
 
         for item in elements[start:end]:
             item_el = d(item)
-            title = item_el.find(".name").text()
-            price = title.find("$")
+            title = item_el.find(".company").text()
+            text = item_el.find(".name").text()
+            price = text.find("$")
             items.append({
                 'from': "gustazos",
-                "title": title,
-                "text": item_el.find(".name").text(),
+                # "title": title,
+                "text": text,
                 "image": item_el.find("img").attr["src"],
                 "link": "http://www.gustazos.com%s" % (
                     item_el.find(".company").attr["href"]),
-                "price": title[price:price + 4],
+                "price": text[price:price + 4].rstrip(),
             })
     elif company == "groupon":
         br = mechanize.Browser()
@@ -204,7 +206,7 @@ def get_groupon(start, end, index, company_list):
                 prices = d(first.find(".price").children("span")[0]).text()
             items.append({
                 'from': "groupon",
-                "title": first(".title").text(),
+                # "title": first(".title").text(),
                 "text": first(".description").text(),
                 "image": first.find("img").attr["src"],
                 "link": "http://www.groupon.com.pr%s" % (
@@ -223,7 +225,7 @@ def get_groupon(start, end, index, company_list):
                 prices = item_el.find(".price").find("span")[0]
             items.append({
                 'from': "groupon",
-                "title": item_el(".deal-title").text(),
+                # "title": item_el(".deal-title").text(),
                 "text": item_el(".merchant-name").text(),
                 "image": item_el.find("img").attr["src"],
                 "link": "http://www.groupon.com.pr%s" % (
