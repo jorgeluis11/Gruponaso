@@ -1,3 +1,0 @@
-push_notifications
-push_notifications/south_migrations
-push_notifications/migrations

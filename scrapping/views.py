@@ -81,7 +81,7 @@ def get_groupon(start, end, index, company_list):
             items.append({
                 'from': "groopanda",
                 # "title": item_el.children(".list_item_merchant").text(),
-                "text": item_el.children(".list_item_title").text(),
+                "title": item_el.children(".list_item_title").text(),
                 "image": item_el.children(".list_item_image img").attr["src"],
                 "link": item_el.children(".list_item_image").attr["href"],
                 "price": item_el.find(".button_price").text(),
@@ -99,7 +99,7 @@ def get_groupon(start, end, index, company_list):
                 {
                     'from': "oferta",
                     # "title": d(".name").text(),
-                    "text": d(".description").children("p").text(),
+                    "title": d(".description").children("p").text(),
                     "image": d(".gallery2-holder").find("li:first").
                     children("img").attr["src"],
                     "link": "http://www.ofertadeldia.com" +
@@ -114,7 +114,7 @@ def get_groupon(start, end, index, company_list):
                 {
                     'from': "oferta",
                     # "title": item_el.find(".title").text(),
-                    "text": item_el.find(".advertiser").text(),
+                    "title": item_el.find(".advertiser").text(),
                     "image": item_el.find(".image").children("img")
                     .attr["src"],
                     "link": "http://www.ofertadeldia.com" + item_el.
@@ -132,8 +132,8 @@ def get_groupon(start, end, index, company_list):
             items.append(
                 {
                     'from': "ofertones",
-                    # "title": item_el.find(".desc").text(),
-                    "text": "",
+                    "title": item_el.find(".desc").text(),
+                    # "title": "",
                     "image": "http://www.ofertones.com" + item_el.
                     children("img").attr["src"],
                     "link": "http://www.ofertones.com" + item_el.attr["href"],
@@ -160,7 +160,7 @@ def get_groupon(start, end, index, company_list):
                 {
                     'from': "gustazos",
                     # "title": first(".summary").children("h1").children("a").text(),
-                    "text": first(".description").children("p").text(),
+                    "title": first(".description").children("p").text(),
                     "image": first(".slideshow").find("img").attr["src"],
                     "link": "http://www.gustazos.com" + d(".summary").
                     find("a").attr["href"],
@@ -181,7 +181,7 @@ def get_groupon(start, end, index, company_list):
             items.append({
                 'from': "gustazos",
                 # "title": title,
-                "text": text,
+                "title": text,
                 "image": item_el.find("img").attr["src"],
                 "link": "http://www.gustazos.com%s" % (
                     item_el.find(".company").attr["href"]),
@@ -207,7 +207,7 @@ def get_groupon(start, end, index, company_list):
             items.append({
                 'from': "groupon",
                 # "title": first(".title").text(),
-                "text": first(".description").text(),
+                "title": first(".description").text(),
                 "image": first.find("img").attr["src"],
                 "link": "http://www.groupon.com.pr%s" % (
                     first(".title").attr["href"]),
@@ -226,7 +226,7 @@ def get_groupon(start, end, index, company_list):
             items.append({
                 'from': "groupon",
                 # "title": item_el(".deal-title").text(),
-                "text": item_el(".merchant-name").text(),
+                "title": item_el(".merchant-name").text(),
                 "image": item_el.find("img").attr["src"],
                 "link": "http://www.groupon.com.pr%s" % (
                     item_el(".title").attr["href"]),
