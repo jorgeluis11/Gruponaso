@@ -27,10 +27,14 @@ link = {
         "link": "http://www.gustazos.com/?utm_source= \
         splashpage&utm_medium=website&utm_campaign=2012-10-SplashPageCity-PR",
         "element": "div.boxContent"
+    },
+    "peroquedescuentos": {
+        "link": "http://peroquedescuentos.com/active",
+        "element": "div.content"
     }
 }
 
-page_list = {'pages': ["oferta,ofertones,groupon,groopanda,gustazos"]}
+page_list = {'pages': ["oferta,peroquedescuentos,ofertones,groupon,groopanda,gustazos"]}
 
 limit = 6
 
@@ -47,7 +51,7 @@ def index(request):
         length = len(groupon)
         print length
         if length != limit:
-        #and length != index + 1:
+            #and length != index + 1:
             next = limit - length
             index = index + 1
             start = next
@@ -119,6 +123,65 @@ def get_groupon(start, end, index, company_list):
                     "link": "http://www.ofertadeldia.com" + item_el.
                     find("a").attr["href"],
                     "price": item_el.find(".price").text(),
+                })
+    elif company == "peroquedescuentos":
+        br = mechanize.Browser()
+        website = link.get(company)
+        br.addheaders = [('User-agent', 'Mozilla/5.0 (X11; U; \
+            Linux i686; en-US; rv:1.9.0.1) Gecko/2008071615 \
+            Fedora/3.0.1-1.fc9 Firefox/3.0.1')]
+        r = br.open(website.get("link"))
+        r = br.open(website.get("link"))
+        html = r.read()
+        d = pq(html)
+        elements = d(website.get("element"))
+
+        if start is 0:
+            first = d(".deal.box")
+            # face = d(elements[0]).find("a").attr["href"]
+            items.append(
+                {
+                    'from': "peroquedescuentos",
+                    # "title": d(".name").text(),
+                    "title": first.children("h1").text(),
+                    "image": first.find(".picture_main").attr["src"],
+                    "link" : first.find("a").attr["href"],
+                    "price": first.find(".deal-price").html(),
+                })
+            start = start + 1
+            end = end
+
+        # face = d(elements[1]).find("a").attr["href"]
+        # if face is None:
+        #     elements.pop(1)
+
+        # for item in elements[start:end]:
+        #     item_el = d(item)
+        #     title = item_el.find(".company").text()
+        #     text = item_el.find(".name").text()
+        #     price = text.find("$")
+        #     items.append({
+        #         'from': "gustazos",
+        #         # "title": title,
+        #         "title": text,
+        #         "image": item_el.find("img").attr["src"],
+        #         "link": "http://www.gustazos.com%s" % (
+        #             item_el.find(".company").attr["href"]),
+        #         "price": text[price:price + 4].rstrip(),
+        #     })
+
+        for item in d(website.get("element"))[start:end]:
+            item_el = d(item)
+            price = item_el.find(".price").text()
+            price_index = price.find("$")
+            items.append(
+                {
+                    'from': "peroquedescuentos",
+                    # "title": item_el.find(".title").text(),
+                    "title": item_el.find(".title").text(),
+                    "image": item_el.find("img").attr["src"],
+                    "link": item_el.find("a").attr["href"],
+                    "price": price[price_index:price_index + 4].replace(" ", ""),
                 })
     elif company == "ofertones":
         website = link.get(company)
