@@ -197,7 +197,7 @@ def get_groupon(start, end, index, company_list):
                     "title": item_el.find(".desc").text(),
                     # "title": "",
                     "image": "http://www.ofertones.com" + item_el.
-                    children("img").attr["src"],
+                    find("img").attr["src_m"],
                     "link": "http://www.ofertones.com" + item_el.attr["href"],
                     "price": price[0:len(price) - 5].replace(" ", "")
                 })
@@ -226,7 +226,7 @@ def get_groupon(start, end, index, company_list):
                     "image": first(".slideshow").find("img").attr["src"],
                     "link": "http://www.gustazos.com" + d(".summary").
                     find("a").attr["href"],
-                    "price": first.find(".price").text(),
+                    "price": first.find(".price").text()[0:4],
                 })
             start = start + 1
             # end = end
@@ -247,7 +247,7 @@ def get_groupon(start, end, index, company_list):
                 "image": item_el.find("img").attr["src"],
                 "link": "http://www.gustazos.com%s" % (
                     item_el.find(".company").attr["href"]),
-                "price": text[price:price + 4].rstrip(),
+                "price": text[price:price + 4].rstrip().replace(".", ""),
             })
     elif company == "groupon":
         br = mechanize.Browser()
