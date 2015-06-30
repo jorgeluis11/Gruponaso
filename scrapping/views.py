@@ -13,15 +13,15 @@ link = {
     },
     "oferta": {
         "link": "http://www.ofertadeldia.com/puerto-rico-ofertas/oferta",
-        "element": "li.other-offer"
+        "element": ".wrapping .item"
     },
     "ofertones": {
         "link": "http://www.ofertones.com/pr",
         "element": "a.js_offer"
     },
     "groupon": {
-        "link": "http://www.groupon.com.pr/descuentos/all",
-        "element": "div.deal-box"
+        "link": "http://www.groupon.com.pr/browse/san-juan?context=local",
+        "element": "figure.deal-card"
     },
     "gustazos": {
         "link": "http://www.gustazos.com/?utm_source= \
@@ -92,18 +92,17 @@ def get_groupon(start, end, index, company_list):
         d = pq(response.content)
 
         if start is 0:
-            price = d(".price-section").find(".price").text()
+            target = d(".intro")
+            price = target.find(".price").text()
             s = price.find('$')
 
             items.append(
                 {
                     'from': "oferta",
                     # "title": d(".name").text(),
-                    "title": d(".description").children("p").text(),
-                    "image": d(".gallery2-holder").find("li:first").
-                    children("img").attr["src"],
-                    "link": "http://www.ofertadeldia.com" +
-                            d(".btn-purchase").attr["href"],
+                    "title": target.find(".intro-heading").text(),
+                    "image": target.find(".mobile-hidden").attr["src"],
+                    "link": target.find("a").attr["href"],
                     "price": price[s:len(price)].replace(" ", ""),
                 })
             end = end - 1
@@ -114,12 +113,12 @@ def get_groupon(start, end, index, company_list):
                 {
                     'from': "oferta",
                     # "title": item_el.find(".title").text(),
-                    "title": item_el.find(".advertiser").text(),
-                    "image": item_el.find(".image").children("img")
+                    "title": item_el.find(".item-title").text(),
+                    "image": item_el.find(".image-holder").children("img")
                     .attr["src"],
                     "link": "http://www.ofertadeldia.com" + item_el.
                     find("a").attr["href"],
-                    "price": item_el.find(".price").children(".amount").text(),
+                    "price": item_el.find(".price").text(),
                 })
     elif company == "ofertones":
         website = link.get(company)
@@ -197,40 +196,36 @@ def get_groupon(start, end, index, company_list):
         r = br.open(website.get("link"))
         html = r.read()
         d = pq(html)
-
+        print start
         if start is 0:
-            first = d(".first-deal")
-            try:
-                prices = d(first.find(".price").children("span")[1]).text()
-            except Exception:
-                prices = d(first.find(".price").children("span")[0]).text()
+            first = d("#hero-tile")
+            title = first(".hero-tile-title").text()
+            price = title.find("$")
+
             items.append({
                 'from': "groupon",
                 # "title": first(".title").text(),
-                "title": first(".description").text(),
+                "title": title,
                 "image": first.find("img").attr["src"],
                 "link": "http://www.groupon.com.pr%s" % (
-                    first(".title").attr["href"]),
-                "price": prices,
+                    first(".btn-buy").attr["href"]),
+                "price": title[price:price + 4].rstrip(),
             })
             end = end - 1
-
         elements = d(website.get("element"))
 
         for item in elements[start:end]:
             item_el = d(item)
-            try:
-                prices = item_el.find(".price").find("span")[1]
-            except Exception:
-                prices = item_el.find(".price").find("span")[0]
+            title = item_el.find(".deal-title").text()
+            prices = title.find("$")
             items.append({
                 'from': "groupon",
                 # "title": item_el(".deal-title").text(),
-                "title": item_el(".merchant-name").text(),
-                "image": item_el.find("img").attr["src"],
+                "title": item_el(".deal-title").text(),
+                "image": item_el.find("img.lazy-load").attr["data-original"],
                 "link": "http://www.groupon.com.pr%s" % (
-                    item_el(".title").attr["href"]),
-                "price": d(prices).text(),
+                    item_el(".deal-tile-inner").attr["href"]),
+                "price": title[prices:prices + 4].rstrip(),
             })
     return items
 
