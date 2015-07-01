@@ -199,7 +199,7 @@ def get_groupon(start, end, index, company_list):
             price_index = price.find("$")
             items.append(
                 {
-                    'from': "peroquedescuentos",
+                    'from': "prgoza",
                     # "title": item_el.find(".title").text(),
                     "title": item_el.find(".allTitle").text(),
                     "image": item_el.find("img").attr["src"],
