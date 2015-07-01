@@ -31,10 +31,28 @@ link = {
     "peroquedescuentos": {
         "link": "http://peroquedescuentos.com/active",
         "element": "div.content"
+    },
+    "prgoza": {
+        "link": "http://www.prgoza.com/deal/all",
+        "element": "div.allDeal"
+    },
+    # "caprichos": {
+    #     "link": "http://www.prgoza.com/deal/all",
+    #     "element": "div.allDeal"
+    # }
+    "kokigo": {
+        "link": "http://www.kokigo.com/discountdeal/",
+        "element": "div.Getway_second_priority"
+    },
+    "puertoricolike": {
+        "link": "http://www.puertoricolike.com/ofertas/deals/recent/",
+        "element": "li.item"
     }
 }
 
-page_list = {'pages': ["oferta,peroquedescuentos,ofertones,groupon,groopanda,gustazos"]}
+page_list = {'pages': ["oferta,peroquedescuentos,ofertones,groupon,\
+                        groopanda,gustazos,peroquedescuentos,kokigo,\
+                        puertoricolike"]}
 
 limit = 6
 
@@ -51,7 +69,6 @@ def index(request):
         length = len(groupon)
         print length
         if length != limit:
-            #and length != index + 1:
             next = limit - length
             index = index + 1
             start = next
@@ -151,25 +168,6 @@ def get_groupon(start, end, index, company_list):
             start = start + 1
             end = end
 
-        # face = d(elements[1]).find("a").attr["href"]
-        # if face is None:
-        #     elements.pop(1)
-
-        # for item in elements[start:end]:
-        #     item_el = d(item)
-        #     title = item_el.find(".company").text()
-        #     text = item_el.find(".name").text()
-        #     price = text.find("$")
-        #     items.append({
-        #         'from': "gustazos",
-        #         # "title": title,
-        #         "title": text,
-        #         "image": item_el.find("img").attr["src"],
-        #         "link": "http://www.gustazos.com%s" % (
-        #             item_el.find(".company").attr["href"]),
-        #         "price": text[price:price + 4].rstrip(),
-        #     })
-
         for item in d(website.get("element"))[start:end]:
             item_el = d(item)
             price = item_el.find(".price").text()
@@ -182,6 +180,32 @@ def get_groupon(start, end, index, company_list):
                     "image": item_el.find("img").attr["src"],
                     "link": item_el.find("a").attr["href"],
                     "price": price[price_index:price_index + 4].replace(" ", ""),
+                })
+    elif company == "prgoza":
+        br = mechanize.Browser()
+        website = link.get(company)
+        br.addheaders = [('User-agent', 'Mozilla/5.0 (X11; U; \
+            Linux i686; en-US; rv:1.9.0.1) Gecko/2008071615 \
+            Fedora/3.0.1-1.fc9 Firefox/3.0.1')]
+        r = br.open(website.get("link"))
+        r = br.open(website.get("link"))
+        html = r.read()
+        d = pq(html)
+        elements = d(website.get("element"))
+
+        for item in d(website.get("element"))[start:end]:
+            item_el = d(item)
+            price = item_el.find(".buy-deal").text()
+            price_index = price.find("$")
+            items.append(
+                {
+                    'from': "peroquedescuentos",
+                    # "title": item_el.find(".title").text(),
+                    "title": item_el.find(".allTitle").text(),
+                    "image": item_el.find("img").attr["src"],
+                    "link": "http://www.prgoza.com/" +
+                            item_el.find("a").attr["href"],
+                    "price": price[price_index:price_index + 5].replace(" ",""),
                 })
     elif company == "ofertones":
         website = link.get(company)
@@ -200,6 +224,46 @@ def get_groupon(start, end, index, company_list):
                     find("img").attr["src_m"],
                     "link": "http://www.ofertones.com" + item_el.attr["href"],
                     "price": price[0:len(price) - 5].replace(" ", "")
+                })
+    elif company == "kokigo":
+        website = link.get(company)
+        response = requests.get(website.get("link"))
+        d = pq(response.content)
+
+        for item in d(website.get("element"))[start:end]:
+            item_el = d(item)
+            title = item_el.find(".hover_info").text()
+            image = item_el.find(".getway_second-imgpanel>a").attr["style"]
+            s = title.find('$')
+
+            items.append(
+                {
+                    'from': "kokigo",
+                    "title": title,
+                    # "title": "",
+                    "image": "http://www.kokigo.com" +
+                             image[image.find("(") + 1: image.find(")")],
+                    "link": "http://www.kokigo.com" +
+                            item_el.find(".hover_info>a").attr["href"],
+                    "price": title[s:s + 4].replace(" ", "")
+                })
+    elif company == "puertoricolike":
+        website = link.get(company)
+        response = requests.get(website.get("link"))
+        d = pq(response.content)
+
+        for item in d(website.get("element"))[start:end]:
+            item_el = d(item)
+            # s = title.find('$')
+
+            items.append(
+                {
+                    'from': "puertoricolike",
+                    "title": item_el.find(".product-name").text(),
+                    # "title": "",
+                    "image": item_el.find(".recent-image").find("img").attr["src"],
+                    "link": item_el.find(".recent-image").attr["href"],
+                    # "price": title[s:s + 4].replace(" ", "")
                 })
     elif company == "gustazos":
         br = mechanize.Browser()
