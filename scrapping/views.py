@@ -177,7 +177,7 @@ def get_groupon(start, end, index, company_list):
                     'from': "peroquedescuentos",
                     # "title": item_el.find(".title").text(),
                     "title": item_el.find(".title").text(),
-                    "image": item_el.find("img").attr["src"],
+                    "image": "http://peroquedescuentos.com"+item_el.find("img").attr["src"],
                     "link": item_el.find("a").attr["href"],
                     "price": price[price_index:price_index + 4].replace(" ", ""),
                 })
