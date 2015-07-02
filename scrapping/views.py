@@ -50,9 +50,9 @@ link = {
     }
 }
 
-page_list = {'pages': ["oferta,peroquedescuentos,ofertones,groupon,\
-                        groopanda,gustazos,peroquedescuentos,kokigo,\
-                        puertoricolike"]}
+page_list = {'pages': ["oferta", "peroquedescuentos", "ofertones", "groupon",
+                       "groopanda", "gustazos", "peroquedescuentos", "kokigo",
+                       "puertoricolike"]}
 
 limit = 6
 
